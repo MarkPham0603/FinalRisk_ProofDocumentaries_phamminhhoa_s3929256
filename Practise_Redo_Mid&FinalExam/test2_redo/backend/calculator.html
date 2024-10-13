@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>WebSocket Calculator</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+    }
+    input, button {
+      margin: 5px;
+    }
+    ul {
+      list-style-type: none;
+      padding: 0;
+    }
+  </style>
+</head>
+<body>
+  <h1>WebSocket Calculator</h1>
+  <input type="text" id="numberInput" placeholder="Enter a number">
+  <button id="sendButton">Send</button>
+  <button id="overButton">OVER</button>
+  <ul id="results"></ul>
+
+  <script>
+    const ws = new WebSocket('ws://localhost:8080');
+    const numberInput = document.getElementById('numberInput');
+    const sendButton = document.getElementById('sendButton');
+    const overButton = document.getElementById('overButton');
+    const results = document.getElementById('results');
+
+    ws.onopen = () => {
+      console.log('Connected to the server');
+    };
+
+    ws.onmessage = (event) => {
+      console.log('Received from server:', event.data); // Log received messages
+      const li = document.createElement('li');
+      li.textContent = event.data;
+      results.appendChild(li);
+    };
+
+    sendButton.addEventListener('click', () => {
+      const number = numberInput.value;
+      if (number) {
+        console.log('Sending:', number); // Log sent numbers
+        ws.send(number);
+        numberInput.value = '';
+      }
+    });
+
+    overButton.addEventListener('click', () => {
+      console.log('Sending: OVER'); // Log the "OVER" message
+      ws.send('OVER');
+    });
+
+    ws.onclose = () => {
+      console.log('Disconnected from the server');
+    };
+  </script>
+</body>
+</html>
